@@ -40,7 +40,7 @@ public class FilmController {
 
     @PutMapping
     @ResponseBody
-    public Film saveFilm(@RequestBody @Valid Film film) throws ValidationException{
+    public Film saveFilm(@RequestBody @Valid Film film) throws ValidationException {
         if (isCanSave(film) && films.containsKey(film.getId())) {
             films.put(film.getId(), film);
             log.info("Фильм обновлен: {}", film);
