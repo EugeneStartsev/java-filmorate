@@ -49,7 +49,6 @@ public class FilmController {
             log.info("Фильм не обновлен: {}", film);
             throw new ValidationException("Такой фильм не может быть обновлен");
         }
-
     }
 
     public boolean isCanSave(Film film) {
@@ -57,5 +56,4 @@ public class FilmController {
         if (film.getReleaseDate().isBefore(LocalDate.parse("1895-12-28"))) return false;
         return !(film.getDuration() < 0);
     }
-
 }
