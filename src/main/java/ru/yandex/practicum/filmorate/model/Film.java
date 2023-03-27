@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.experimental.FieldDefaults;
 import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotBlank;
@@ -8,16 +10,17 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Data
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Film {
 
     @Nullable
-    private int id;
+    int id;
     @NotNull
     @NotBlank
-    private String name;
-    private String description;
-    private LocalDate releaseDate;
-    private int duration;
+    String name;
+    String description;
+    LocalDate releaseDate;
+    int duration;
 
     public Film(int id, String name, String description, LocalDate releaseDate, int duration) {
         this.id = id;

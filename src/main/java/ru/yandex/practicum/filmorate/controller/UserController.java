@@ -20,7 +20,7 @@ public class UserController {
 
     @GetMapping
     public Collection<User> getUsers() {
-        log.info("Количество пользователей: " + users.size());
+        log.info("Количество пользователей: {}", users.size());
         return users.values();
     }
 
