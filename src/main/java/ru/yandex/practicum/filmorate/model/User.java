@@ -1,27 +1,38 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.experimental.FieldDefaults;
 import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
-@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class User {
 
     @Nullable
-    private int id;
+    int id;
     @Email
-    private String email;
+    String email;
     @NotNull
     @NotBlank
-    private String login;
+    String login;
     @Nullable
-    private String name;
-    private LocalDate birthday;
+    String name;
+    LocalDate birthday;
+    Set<Integer> friends = new HashSet<>();
 
+    public User(int id, String email, String login, String name, LocalDate birthday) {
+        this.id = id;
+        this.email = email;
+        this.login = login;
+        this.name = name;
+        this.birthday = birthday;
+    }
 }
