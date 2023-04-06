@@ -8,8 +8,12 @@ import java.util.Collection;
 @Component
 public interface UserStorage {
     User addUser(User user);
+
     User deleteUser(User user);
+
     User updateUser(User user);
+
     Collection<User> getUsers();
+
     User getUserById(Integer id);
 }
