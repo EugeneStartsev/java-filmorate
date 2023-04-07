@@ -17,29 +17,27 @@ import java.util.Set;
 @Slf4j
 public class FilmController {
 
-    private final InMemoryFilmStorage inMemoryFilmStorage;
     private final FilmService filmService;
 
     @Autowired
-    public FilmController(InMemoryFilmStorage inMemoryFilmStorage, FilmService filmService) {
-        this.inMemoryFilmStorage = inMemoryFilmStorage;
+    public FilmController(FilmService filmService) {
         this.filmService = filmService;
     }
 
     @GetMapping
     public Collection<Film> getFilms() {
-        log.info("Количество добавленных фильмов: " + inMemoryFilmStorage.getFilms().size());
-        return inMemoryFilmStorage.getFilms();
+        log.info("Количество добавленных фильмов: " + filmService.getFilmStorage().getFilms().size());
+        return filmService.getFilmStorage().getFilms();
     }
 
     @PostMapping
     public Film addFilms(@RequestBody @Valid Film film) throws ValidationException {
-        return inMemoryFilmStorage.addFilm(film);
+        return filmService.getFilmStorage().addFilm(film);
     }
 
     @PutMapping
     public Film saveFilm(@RequestBody @Valid Film film) throws ValidationException {
-        return inMemoryFilmStorage.updateFilm(film);
+        return filmService.getFilmStorage().updateFilm(film);
     }
 
     @PutMapping("/{id}/like/{userId}")
@@ -59,6 +57,6 @@ public class FilmController {
 
     @GetMapping("/{id}")
     public Film getFilmById(@PathVariable int id) {
-        return inMemoryFilmStorage.getFilmById(id);
+        return filmService.getFilmStorage().getFilmById(id);
     }
 }

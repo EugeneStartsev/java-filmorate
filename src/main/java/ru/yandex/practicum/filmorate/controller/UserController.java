@@ -16,29 +16,27 @@ import java.util.List;
 @Slf4j
 public class UserController {
 
-    private final InMemoryUserStorage inMemoryUserStorage;
     private final UserService userService;
 
     @Autowired
-    public UserController(InMemoryUserStorage inMemoryUserStorage, UserService userService) {
-        this.inMemoryUserStorage = inMemoryUserStorage;
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
     @GetMapping
     public Collection<User> getUsers() {
-        log.info("Количество пользователей: {}", inMemoryUserStorage.getUsers().size());
-        return inMemoryUserStorage.getUsers();
+        log.info("Количество пользователей: {}", userService.getUserStorage().getUsers().size());
+        return userService.getUserStorage().getUsers();
     }
 
     @PostMapping
     public User saveUser(@Valid @RequestBody User user) {
-        return inMemoryUserStorage.addUser(user);
+        return userService.getUserStorage().addUser(user);
     }
 
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
-        return inMemoryUserStorage.updateUser(user);
+        return userService.getUserStorage().updateUser(user);
     }
 
     @GetMapping("/{id}/friends")
@@ -63,6 +61,6 @@ public class UserController {
 
     @GetMapping("/{id}")
     public User getUserById(@PathVariable int id) {
-        return inMemoryUserStorage.getUserById(id);
+        return userService.getUserStorage().getUserById(id);
     }
 }
