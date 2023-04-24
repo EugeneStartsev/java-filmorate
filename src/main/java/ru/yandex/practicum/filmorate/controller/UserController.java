@@ -1,60 +1,65 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
 
-    private final Map<Integer, User> users = new HashMap<>();
+    private final UserService userService;
+
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping
     public Collection<User> getUsers() {
-        log.info("Количество пользователей: {}", users.size());
-        return users.values();
+        log.info("Количество пользователей: {}", userService.getUserStorage().getUsers().size());
+        return userService.getUserStorage().getUsers();
     }
 
     @PostMapping
-    @ResponseBody
-    public User saveUser(@Valid @RequestBody User user) throws ValidationException {
-        if (isCanSaveUser(user)) {
-            user.setId(users.size() + 1);
-            users.put(user.getId(), user);
-            log.info("Пользователь сохранен: {}", user);
-            return user;
-        } else {
-            log.info("Пользователь не сохранен: {}", user);
-            throw new ValidationException("Такой пользователь не может быть добавлен");
-        }
+    public User saveUser(@Valid @RequestBody User user) {
+        return userService.getUserStorage().addUser(user);
     }
 
     @PutMapping
-    @ResponseBody
-    public User updateUser(@Valid @RequestBody User user) throws ValidationException {
-        if (isCanSaveUser(user) && users.containsKey(user.getId())) {
-            users.put(user.getId(), user);
-            log.info("Пользователь успешно обновлен: {}", user);
-            return user;
-        } else {
-            log.info("Пользователь не обновлен: {}", user);
-            throw new ValidationException("Такой пользователь не может быть обновлен");
-        }
+    public User updateUser(@Valid @RequestBody User user) {
+        return userService.getUserStorage().updateUser(user);
     }
 
-    public boolean isCanSaveUser(User user) {
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-        return !user.getBirthday().isAfter(LocalDate.now());
+    @GetMapping("/{id}/friends")
+    public List<User> getFriends(@PathVariable int id) {
+        return userService.getFriends(id);
+    }
+
+    @PutMapping("/{id}/friends/{friendId}")
+    public User addFriend(@PathVariable int id, @PathVariable int friendId) {
+        return userService.addFriend(id, friendId);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public User deleteFriend(@PathVariable int friendId, @PathVariable int id) {
+        return userService.deleteFriend(id, friendId);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> commonFriends(@PathVariable int id, @PathVariable int otherId) {
+        return userService.getCommonFriends(id, otherId);
+    }
+
+    @GetMapping("/{id}")
+    public User getUserById(@PathVariable int id) {
+        return userService.getUserStorage().getUserById(id);
     }
 }
