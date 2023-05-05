@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.dao.FilmStorage;
+import ru.yandex.practicum.filmorate.dao.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.dao.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.dao.UserStorage;
 
 import java.time.LocalDate;
 
@@ -33,7 +33,7 @@ public class FilmControllerTest {
     @Test
     public void shouldThrowException() {
         try {
-            Film film = new Film(1, "1", "1", LocalDate.parse("1890-11-11"), 200);
+            Film film = new Film(1, "1", "1", LocalDate.parse("1890-11-11"), 200,1);
             filmController.addFilms(film);
         } catch (ValidationException e) {
             Assertions.assertEquals("Такой фильм не может быть добавлен", e.getMessage());
@@ -41,21 +41,21 @@ public class FilmControllerTest {
 
         try {
             Film film = new Film(1, "1", "                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ",
-                    LocalDate.parse("1890-11-11"), 200);
+                    LocalDate.parse("1890-11-11"), 200, 2);
             filmController.addFilms(film);
         } catch (ValidationException e) {
             Assertions.assertEquals("Такой фильм не может быть добавлен", e.getMessage());
         }
 
         try {
-            Film film = new Film(1, "1", "1", LocalDate.parse("1890-11-11"), -200);
+            Film film = new Film(1, "1", "1", LocalDate.parse("1890-11-11"), -200, 3);
             filmController.addFilms(film);
         } catch (ValidationException e) {
             Assertions.assertEquals("Такой фильм не может быть добавлен", e.getMessage());
         }
 
         try {
-            Film film = new Film(1, "", "1", LocalDate.parse("1890-11-11"), 200);
+            Film film = new Film(1, "", "1", LocalDate.parse("1890-11-11"), 200, 4);
             filmController.addFilms(film);
         } catch (ValidationException e) {
             Assertions.assertEquals("Такой фильм не может быть добавлен", e.getMessage());

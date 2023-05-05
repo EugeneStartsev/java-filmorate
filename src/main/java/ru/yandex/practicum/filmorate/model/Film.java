@@ -23,13 +23,15 @@ public class Film {
     String description;
     LocalDate releaseDate;
     int duration;
+    int rating_id;
     Set<Integer> likes = new HashSet<>();
 
-    public Film(int id, String name, String description, LocalDate releaseDate, int duration) {
+    public Film(int id, String name, String description, LocalDate releaseDate, int duration, int rating_id) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
+        this.rating_id = rating_id;
     }
 }
