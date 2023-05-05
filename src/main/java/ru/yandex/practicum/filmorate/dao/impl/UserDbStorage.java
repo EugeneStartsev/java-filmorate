@@ -1,26 +1,27 @@
 package ru.yandex.practicum.filmorate.dao.impl;
 
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dao.UserStorage;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
+import java.lang.reflect.InvocationTargetException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 @Component
-@Qualifier("userDbStorage")
+@Primary
 public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
-    private final String updateUser = "UPDATE users " + "SET email = ?" + ", login = ?" + ", name = ?" +
-            ", birthday = ? " + "WHERE user_id = ?";
-    private final String allUsers = "SELECT* FROM users";
 
     public UserDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -34,12 +35,23 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User deleteUser(User user) {
-        return null;
+        int id = user.getId();
+        String sqlQuery = "DELETE FROM users WHERE user_id = ?";
+        if (jdbcTemplate.update(sqlQuery, id) > 0) return user;
+        else throw new NotFoundException("Такого пользователя удалить не удалось");
     }
 
     @Override
     public User updateUser(User user) {
-        return null;
+        String sqlQuery = "UPDATE users " + "SET email = ?" + ", login = ?" + ", name = ?" +
+                ", birthday = ? " + "WHERE user_id = ?";
+        if (jdbcTemplate.update(sqlQuery
+                , user.getEmail()
+                , user.getLogin()
+                , user.getName()
+                , user.getBirthday().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                , user.getId()) > 0) return user;
+        else throw new NotFoundException("Такой пользователь не может быть обновлен");
     }
 
     @Override
@@ -50,23 +62,25 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User addUser(User user) {
-        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("users")
-                .usingGeneratedKeyColumns("user_id");
+        if (isCanSaveUser(user)) {
+            SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("users")
+                    .usingGeneratedKeyColumns("user_id");
 
-        Map<String, Object> userParameters = new HashMap<>();
-        userParameters.put("email", user.getEmail());
-        userParameters.put("login", user.getLogin());
-        if (user.getName() != null || !user.getName().isBlank()) {
-            userParameters.put("name", user.getName());
-        } else {
-            userParameters.put("name", user.getLogin());
-            user.setName(user.getLogin());
-        }
-        userParameters.put("birthday", user.getBirthday().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            Map<String, Object> userParameters = new HashMap<>();
+            userParameters.put("email", user.getEmail());
+            userParameters.put("login", user.getLogin());
+            if (user.getName() != null) {
+                userParameters.put("name", user.getName());
+            } else {
+                userParameters.put("name", user.getLogin());
+                user.setName(user.getLogin());
+            }
+            userParameters.put("birthday", user.getBirthday().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
 
-        user.setId(simpleJdbcInsert.executeAndReturnKey(userParameters).intValue());
+            user.setId(simpleJdbcInsert.executeAndReturnKey(userParameters).intValue());
 
-        return user;
+            return user;
+        } else throw new ValidationException("Такой пользователь сохранен быть не может");
     }
 
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
@@ -77,5 +91,12 @@ public class UserDbStorage implements UserStorage {
                 .name(resultSet.getString("name"))
                 .birthday(resultSet.getDate("birthday").toLocalDate())
                 .build();
+    }
+
+    public boolean isCanSaveUser(User user) {
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
+        return !user.getBirthday().isAfter(LocalDate.now());
     }
 }

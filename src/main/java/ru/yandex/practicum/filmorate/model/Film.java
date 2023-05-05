@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 import org.springframework.lang.Nullable;
@@ -13,8 +14,8 @@ import java.util.Set;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Builder
 public class Film {
-
     @Nullable
     int id;
     @NotNull
@@ -23,15 +24,7 @@ public class Film {
     String description;
     LocalDate releaseDate;
     int duration;
-    int rating_id;
+    Rating mpa;
+    Set<Genre> genres;
     Set<Integer> likes = new HashSet<>();
-
-    public Film(int id, String name, String description, LocalDate releaseDate, int duration, int rating_id) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
-        this.rating_id = rating_id;
-    }
 }
