@@ -1,8 +1,8 @@
-package ru.yandex.practicum.filmorate.dao;
+package ru.yandex.practicum.filmorate.storage.inMemoryStorage;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.storage.interfaces.FilmStorage;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -18,7 +18,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Integer, Film> films = new HashMap<>();
 
     public Film addFilm(Film film) {
-        if (isCanSave(film)) {
+        if (isCanSaveFilm(film)) {
             film.setId(films.size() + 1);
             films.put(film.getId(), film);
             log.info("Фильм сохранен: {}", film);
@@ -30,7 +30,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     public Film updateFilm(Film film) {
-        if (isCanSave(film) && films.containsKey(film.getId())) {
+        if (isCanSaveFilm(film) && films.containsKey(film.getId())) {
             films.put(film.getId(), film);
             log.info("Фильм обновлен: {}", film);
             return film;
@@ -55,12 +55,12 @@ public class InMemoryFilmStorage implements FilmStorage {
         return films.values();
     }
 
-    public Film getFilmById(Integer id) {
+    public Film getFilmById(int id) {
         if (films.containsKey(id)) return films.get(id);
         else throw new NotFoundException(String.format("Фильма с таким ID %s нет", id));
     }
 
-    public boolean isCanSave(Film film) {
+    public boolean isCanSaveFilm(Film film) {
         if (film.getDescription().length() > 200) return false;
         if (film.getReleaseDate().isBefore(LocalDate.parse("1895-12-28"))) return false;
         return !(film.getDuration() < 0);

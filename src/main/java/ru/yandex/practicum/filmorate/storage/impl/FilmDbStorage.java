@@ -1,37 +1,44 @@
-package ru.yandex.practicum.filmorate.dao.impl;
+package ru.yandex.practicum.filmorate.storage.impl;
 
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.dao.FilmStorage;
-import ru.yandex.practicum.filmorate.dao.RatingStorage;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.FilmAndGenre;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
+import ru.yandex.practicum.filmorate.storage.interfaces.FilmAndGenreStorage;
+import ru.yandex.practicum.filmorate.storage.interfaces.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.interfaces.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.interfaces.RatingStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Component
 @Primary
 public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
     private final RatingStorage ratingStorage;
+    private final GenreStorage genreStorage;
+    private final FilmAndGenreStorage filmAndGenreStorage;
 
-    public FilmDbStorage(JdbcTemplate jdbcTemplate, RatingStorage ratingStorage) {
+    public FilmDbStorage(JdbcTemplate jdbcTemplate, RatingStorage ratingStorage,
+                         FilmAndGenreStorage filmAndGenreStorage, GenreStorage genreStorage) {
         this.jdbcTemplate = jdbcTemplate;
         this.ratingStorage = ratingStorage;
+        this.filmAndGenreStorage = filmAndGenreStorage;
+        this.genreStorage = genreStorage;
     }
 
     @Override
-    public Film getFilmById(Integer id) {
+    public Film getFilmById(int id) {
         String sqlQuery = "SELECT* FROM films WHERE film_id = ?";
         return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, id);
     }
@@ -57,6 +64,10 @@ public class FilmDbStorage implements FilmStorage {
 
             film.setId(simpleJdbcInsert.executeAndReturnKey(filmParameters).intValue());
 
+            if (film.getGenres() != null) {
+                film.getGenres().forEach(genre -> filmAndGenreStorage.save(genre.getId(), film.getId()));
+            }
+
             return film;
         } else throw new ValidationException("Такой фильм не может быть сохранен");
     }
@@ -73,19 +84,29 @@ public class FilmDbStorage implements FilmStorage {
     public Film updateFilm(Film film) {
         String sqlQuery = "UPDATE films " + "SET name = ?" + ", description = ?" + ", release_date = ?" +
                 ", duration = ? " + ", rating_id = ?" + "WHERE film_id = ?";
-        if (jdbcTemplate.update(sqlQuery
-                , film.getName()
-                , film.getDescription()
-                , film.getReleaseDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                , film.getDuration()
-                , film.getMpa().getId()) > 0) return film;
-        else throw new NotFoundException("Такой пользователь не может быть обновлен");
+            String sqlDeleteQuery = "DELETE FROM film_genre WHERE film_id = ?";
+
+            jdbcTemplate.update(sqlDeleteQuery, film.getId());
+            if (film.getGenres() != null) {
+                film.getGenres().forEach(genre -> filmAndGenreStorage.save(genre.getId(), film.getId()));
+            }
+
+            if (jdbcTemplate.update(sqlQuery,
+                    film.getName(),
+                    film.getDescription(),
+                    film.getReleaseDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                    film.getDuration(),
+                    film.getMpa().getId(),
+                    film.getId()) > 0) return film;
+            else throw new NotFoundException("Такой пользователь не может быть обновлен");
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         Rating rating = ratingStorage.getRatingById(resultSet.getInt("rating_id"));
-
-
+        Set<Genre> genres = new HashSet<>();
+        for (FilmAndGenre filmAndGenre : filmAndGenreStorage.getAllGenresByFilmId(resultSet.getInt("film_id"))) {
+            genres.add(genreStorage.getGenreById(filmAndGenre.getGenreId()));
+        }
         return Film.builder()
                 .id(resultSet.getInt("film_id"))
                 .name(resultSet.getString("name"))
@@ -93,6 +114,7 @@ public class FilmDbStorage implements FilmStorage {
                 .releaseDate(resultSet.getDate("release_date").toLocalDate())
                 .duration(resultSet.getInt("duration"))
                 .mpa(rating)
+                .genres(genres)
                 .build();
     }
 

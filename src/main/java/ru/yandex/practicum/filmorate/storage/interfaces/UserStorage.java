@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.dao;
+package ru.yandex.practicum.filmorate.storage.interfaces;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
@@ -17,4 +17,6 @@ public interface UserStorage {
     Collection<User> getUsers();
 
     User getUserById(Integer id);
+
+    boolean isCanSaveUser(User user);
 }

@@ -1,8 +1,8 @@
-package ru.yandex.practicum.filmorate.dao.impl;
+package ru.yandex.practicum.filmorate.storage.impl;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.dao.RatingStorage;
+import ru.yandex.practicum.filmorate.storage.interfaces.RatingStorage;
 import ru.yandex.practicum.filmorate.model.Rating;
 
 import java.sql.ResultSet;

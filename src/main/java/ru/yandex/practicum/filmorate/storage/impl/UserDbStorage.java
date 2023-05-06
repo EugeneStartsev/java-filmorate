@@ -1,15 +1,14 @@
-package ru.yandex.practicum.filmorate.dao.impl;
+package ru.yandex.practicum.filmorate.storage.impl;
 
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.dao.UserStorage;
+import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.lang.reflect.InvocationTargetException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -45,12 +44,12 @@ public class UserDbStorage implements UserStorage {
     public User updateUser(User user) {
         String sqlQuery = "UPDATE users " + "SET email = ?" + ", login = ?" + ", name = ?" +
                 ", birthday = ? " + "WHERE user_id = ?";
-        if (jdbcTemplate.update(sqlQuery
-                , user.getEmail()
-                , user.getLogin()
-                , user.getName()
-                , user.getBirthday().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                , user.getId()) > 0) return user;
+        if (jdbcTemplate.update(sqlQuery,
+                user.getEmail(),
+                user.getLogin(),
+                user.getName(),
+                user.getBirthday().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                user.getId()) > 0) return user;
         else throw new NotFoundException("Такой пользователь не может быть обновлен");
     }
 

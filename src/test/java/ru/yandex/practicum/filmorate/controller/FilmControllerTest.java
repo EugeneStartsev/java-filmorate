@@ -5,13 +5,16 @@ import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.dao.FilmStorage;
-import ru.yandex.practicum.filmorate.dao.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.dao.InMemoryUserStorage;
-import ru.yandex.practicum.filmorate.dao.UserStorage;
+import ru.yandex.practicum.filmorate.storage.impl.LikeDbStorage;
+import ru.yandex.practicum.filmorate.storage.interfaces.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.inMemoryStorage.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.inMemoryStorage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.interfaces.LikeStorage;
+import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 
 import java.time.LocalDate;
 
@@ -21,12 +24,15 @@ public class FilmControllerTest {
     FilmService filmService;
     FilmStorage filmStorage;
     UserStorage userStorage;
+    LikeDbStorage likeDbStorage;
+    JdbcTemplate jdbcTemplate;
 
     @BeforeEach
     public void beforeEach() {
         filmStorage = new InMemoryFilmStorage();
         userStorage = new InMemoryUserStorage();
-        filmService = new FilmService(filmStorage, userStorage);
+        likeDbStorage = new LikeDbStorage(jdbcTemplate, filmStorage);
+        filmService = new FilmService(filmStorage, userStorage, likeDbStorage);
         filmController = new FilmController(filmService);
     }
 

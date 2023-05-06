@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.dao;
+package ru.yandex.practicum.filmorate.storage.interfaces;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -15,5 +15,7 @@ public interface FilmStorage {
 
     Collection<Film> getFilms();
 
-    Film getFilmById(Integer id);
+    Film getFilmById(int id);
+
+    boolean isCanSaveFilm(Film film);
 }
