@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.storage.interfaces.FilmAndGenreStorage;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Set;
 
 @Component
 public class FilmAndGenreDbStorage implements FilmAndGenreStorage {
@@ -26,7 +25,7 @@ public class FilmAndGenreDbStorage implements FilmAndGenreStorage {
     }
 
     @Override
-    public void save(int genreId, int filmId) {
+    public void addGenre(int genreId, int filmId) {
         String sqlQuery = "INSERT INTO film_genre (film_id , genre_id) VALUES (?, ?)";
         jdbcTemplate.update(sqlQuery, filmId, genreId);
     }

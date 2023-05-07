@@ -65,7 +65,7 @@ public class FilmDbStorage implements FilmStorage {
             film.setId(simpleJdbcInsert.executeAndReturnKey(filmParameters).intValue());
 
             if (film.getGenres() != null) {
-                film.getGenres().forEach(genre -> filmAndGenreStorage.save(genre.getId(), film.getId()));
+                film.getGenres().forEach(genre -> filmAndGenreStorage.addGenre(genre.getId(), film.getId()));
             }
 
             return film;
@@ -88,7 +88,7 @@ public class FilmDbStorage implements FilmStorage {
 
             jdbcTemplate.update(sqlDeleteQuery, film.getId());
             if (film.getGenres() != null) {
-                film.getGenres().forEach(genre -> filmAndGenreStorage.save(genre.getId(), film.getId()));
+                film.getGenres().forEach(genre -> filmAndGenreStorage.addGenre(genre.getId(), film.getId()));
             }
 
             if (jdbcTemplate.update(sqlQuery,
@@ -98,7 +98,7 @@ public class FilmDbStorage implements FilmStorage {
                     film.getDuration(),
                     film.getMpa().getId(),
                     film.getId()) > 0) return film;
-            else throw new NotFoundException("Такой пользователь не может быть обновлен");
+            else throw new NotFoundException("Такой фильм не может быть обновлен");
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {

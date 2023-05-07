@@ -7,9 +7,8 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -18,13 +17,11 @@ import java.util.Set;
 public class Film {
     @Nullable
     int id;
-    @NotNull
-    @NotBlank
-    String name;
+    @NotBlank String name;
     String description;
     LocalDate releaseDate;
+    @Positive
     int duration;
     Rating mpa;
     Set<Genre> genres;
-    Set<Integer> likes = new HashSet<>();
 }
