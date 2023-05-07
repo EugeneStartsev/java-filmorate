@@ -84,21 +84,21 @@ public class FilmDbStorage implements FilmStorage {
     public Film updateFilm(Film film) {
         String sqlQuery = "UPDATE films " + "SET name = ?" + ", description = ?" + ", release_date = ?" +
                 ", duration = ? " + ", rating_id = ?" + "WHERE film_id = ?";
-            String sqlDeleteQuery = "DELETE FROM film_genre WHERE film_id = ?";
+        String sqlDeleteQuery = "DELETE FROM film_genre WHERE film_id = ?";
 
-            jdbcTemplate.update(sqlDeleteQuery, film.getId());
-            if (film.getGenres() != null) {
-                film.getGenres().forEach(genre -> filmAndGenreStorage.addGenre(genre.getId(), film.getId()));
-            }
+        jdbcTemplate.update(sqlDeleteQuery, film.getId());
+        if (film.getGenres() != null) {
+            film.getGenres().forEach(genre -> filmAndGenreStorage.addGenre(genre.getId(), film.getId()));
+        }
 
-            if (jdbcTemplate.update(sqlQuery,
-                    film.getName(),
-                    film.getDescription(),
-                    film.getReleaseDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
-                    film.getDuration(),
-                    film.getMpa().getId(),
-                    film.getId()) > 0) return film;
-            else throw new NotFoundException("Такой фильм не может быть обновлен");
+        if (jdbcTemplate.update(sqlQuery,
+                film.getName(),
+                film.getDescription(),
+                film.getReleaseDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                film.getDuration(),
+                film.getMpa().getId(),
+                film.getId()) > 0) return film;
+        else throw new NotFoundException("Такой фильм не может быть обновлен");
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
