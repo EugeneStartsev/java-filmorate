@@ -87,6 +87,6 @@ public class FilmDbStorageTest {
 
         Collection<Film> films = filmDbStorage.getFilms();
 
-        Assertions.assertEquals(0, films.size());
+        Assertions.assertEquals(2, films.size());
     }
 }

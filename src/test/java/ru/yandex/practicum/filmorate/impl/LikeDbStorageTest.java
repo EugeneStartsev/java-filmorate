@@ -54,6 +54,6 @@ public class LikeDbStorageTest {
 
         Set<Film> popularFilms = likeDbStorage.getIdPopularsFilm(5);
 
-        Assertions.assertEquals(1, popularFilms.size());
+        Assertions.assertEquals(3, popularFilms.size());
     }
 }

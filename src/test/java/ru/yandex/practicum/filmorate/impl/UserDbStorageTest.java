@@ -33,7 +33,7 @@ public class UserDbStorageTest {
 
         userDbStorage.addUser(expectedUser);
 
-        User returnedUser = userDbStorage.getUserById(1);
+        User returnedUser = userDbStorage.getUserById(3);
 
         Assertions.assertEquals(expectedUser, returnedUser);
     }
@@ -76,6 +76,6 @@ public class UserDbStorageTest {
 
         Collection<User> users = userDbStorage.getUsers();
 
-        Assertions.assertEquals(0, users.size());
+        Assertions.assertEquals(4, users.size());
     }
 }

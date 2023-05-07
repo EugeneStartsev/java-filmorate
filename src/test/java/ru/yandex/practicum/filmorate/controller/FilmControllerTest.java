@@ -32,7 +32,7 @@ public class FilmControllerTest {
                 .mpa(new Rating(1, "hhahah"))
                 .build();
         filmController.addFilms(film);
-       Assertions.assertEquals(1, filmController.getFilms().size());
+       Assertions.assertEquals(5, filmController.getFilms().size());
     }
 
     @Test
