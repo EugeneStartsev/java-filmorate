@@ -1,15 +1,18 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.experimental.FieldDefaults;
 
 import java.util.Objects;
 
 @AllArgsConstructor
 @Data
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Genre {
-    private int id;
-    private String name;
+    int id;
+    String name;
 
     @Override
     public boolean equals(Object o) {

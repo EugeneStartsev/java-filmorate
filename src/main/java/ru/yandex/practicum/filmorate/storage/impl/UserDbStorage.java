@@ -92,7 +92,7 @@ public class UserDbStorage implements UserStorage {
                 .build();
     }
 
-    public boolean isCanSaveUser(User user) {
+    private boolean isCanSaveUser(User user) {
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }

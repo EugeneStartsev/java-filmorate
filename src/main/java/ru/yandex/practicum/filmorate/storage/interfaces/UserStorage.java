@@ -16,6 +16,4 @@ public interface UserStorage {
     Collection<User> getUsers();
 
     User getUserById(Integer id);
-
-    boolean isCanSaveUser(User user);
 }

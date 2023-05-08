@@ -16,6 +16,4 @@ public interface FilmStorage {
     Collection<Film> getFilms();
 
     Film getFilmById(int id);
-
-    boolean isCanSaveFilm(Film film);
 }

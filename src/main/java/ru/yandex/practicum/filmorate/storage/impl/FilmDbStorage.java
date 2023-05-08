@@ -118,9 +118,9 @@ public class FilmDbStorage implements FilmStorage {
                 .build();
     }
 
-    public boolean isCanSaveFilm(Film film) {
+    private boolean isCanSaveFilm(Film film) {
         if (film.getDescription().length() > 200) return false;
         if (film.getReleaseDate().isBefore(LocalDate.parse("1895-12-28"))) return false;
-        return !(film.getDuration() < 0);
+        return (film.getDuration() > 0);
     }
 }
