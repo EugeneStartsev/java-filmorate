@@ -6,7 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.interfaces.FriendshipStorage;
+import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,10 +19,12 @@ import java.util.Set;
 public class UserService {
 
     private final UserStorage userStorage;
+    private final FriendshipStorage friendshipStorage;
 
     @Autowired
-    public UserService(UserStorage userStorage) {
+    public UserService(UserStorage userStorage, FriendshipStorage friendshipStorage) {
         this.userStorage = userStorage;
+        this.friendshipStorage = friendshipStorage;
     }
 
     public List<User> getFriends(Integer id) {
@@ -81,15 +84,12 @@ public class UserService {
     }
 
     public List<User> getCommonFriends(Integer id, Integer otherId) {
-        User user = userStorage.getUserById(id);
-        User otherUser = userStorage.getUserById(otherId);
-        List<User> commonFriends = new ArrayList<>();
+        List<User> firstUserFriends = new ArrayList<>(friendshipStorage.getFriends(id));
+        List<User> secondUserFriends = new ArrayList<>(friendshipStorage.getFriends(otherId));
 
-        for (Integer i : user.getFriends()) {
-            if (otherUser.getFriends().contains(i)) {
-                commonFriends.add(userStorage.getUserById(i));
-            }
-        }
+        List<User> commonFriends = new ArrayList<>(firstUserFriends);
+        commonFriends.retainAll(secondUserFriends);
+
         log.info("Сформирован список общих друзей {}", commonFriends);
         return commonFriends;
     }

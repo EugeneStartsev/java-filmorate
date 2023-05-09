@@ -40,17 +40,19 @@ public class UserController {
 
     @GetMapping("/{id}/friends")
     public List<User> getFriends(@PathVariable int id) {
-        return userService.getFriends(id);
+        return userService.getFriendshipStorage().getFriends(id);
     }
 
     @PutMapping("/{id}/friends/{friendId}")
     public User addFriend(@PathVariable int id, @PathVariable int friendId) {
-        return userService.addFriend(id, friendId);
+        userService.getFriendshipStorage().addFriend(id, friendId);
+        return userService.getUserStorage().getUserById(id);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
     public User deleteFriend(@PathVariable int friendId, @PathVariable int id) {
-        return userService.deleteFriend(id, friendId);
+        userService.getFriendshipStorage().deleteFriend(id, friendId);
+        return userService.getUserStorage().getUserById(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
